@@ -59,7 +59,7 @@ const AddProperty = () => {
       file,
       preview: URL.createObjectURL(file)
     }));
-    setImageFiles(prev => [...prev, ...newImageFiles].slice(0, 5)); 
+    setImageFiles(prev => [...prev, ...newImageFiles].slice(0, 5));
   };
 
   const handleImageRemove = (index) => {
@@ -85,7 +85,7 @@ const AddProperty = () => {
       });
       return;
     }
-    
+
     // Simulate image upload and get URLs (replace with actual upload logic)
     const uploadedImageUrls = imageFiles.map(imgFile => imgFile.preview);
 
@@ -93,7 +93,7 @@ const AddProperty = () => {
     const newProperty = {
       id: Date.now(), // Temporary ID
       ...propertyData,
-      images: uploadedImageUrls, 
+      images: uploadedImageUrls,
       userId: user.id, // Associate property with user
       status: 'publicada', // Default status
       createdAt: new Date().toISOString(),
@@ -242,11 +242,11 @@ const AddProperty = () => {
                     animate={{ opacity: 1, scale: 1 }}
                     className="relative group"
                   >
-                    <img 
+                    <img
                       src={imgFile.preview}
                       alt={`Preview ${index + 1}`}
                       className="w-full h-32 object-cover rounded-lg shadow-md"
-                     src="https://images.unsplash.com/photo-1595872018818-97555653a011" />
+                    />
                     <button
                       type="button"
                       onClick={() => handleImageRemove(index)}

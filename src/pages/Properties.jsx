@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useSearchParams, useLocation as useRouterLocation } from 'react-router-dom';
+import { useParams, useSearchParams, useLocation as useRouterLocation } from 'react-router-dom';
 import { Filter, Grid, List, SortAsc, MapPin, Bed, Bath, Square, Heart, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import SearchFilters from '@/components/SearchFilters';
 
-const Properties = ({ operationType }) => {
+const Properties = () => {
+  const { operationType } = useParams();
+
   const [searchParams] = useSearchParams();
   const routerLocation = useRouterLocation();
 
@@ -14,8 +16,8 @@ const Properties = ({ operationType }) => {
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
 
-  // Mock properties data - MODIFIED TO SHOW ONLY 3 PROPERTIES WITH LOCAL IMAGES
-  const allProperties = [
+  // Mock properties data - MODIFIED TO SHOW 8 PROPERTIES BY REPEATING THE EXISTING ONES
+  const baseProperties = [
     {
       id: 1,
       title: 'Departamento Moderno en Providencia',
@@ -69,18 +71,55 @@ const Properties = ({ operationType }) => {
     },
   ];
 
+  // Repeat the base properties to create 8 entries
+  const allProperties = [
+    ...baseProperties,
+    ...baseProperties.map(prop => ({ ...prop, id: `${prop.id}_dup1`, title: `${prop.title} (Rep. 1)` })),
+    {
+      id: 4,
+      title: 'Penthouse de Lujo en Vitacura',
+      price: 450000000,
+      operation: 'venta',
+      location: 'Vitacura, Santiago',
+      bedrooms: 3,
+      bathrooms: 3,
+      area: 220,
+      type: 'departamento',
+      description: 'Penthouse exclusivo con terraza privada y vista a la cordillera',
+      imageUrl: {
+        small: '/images/propiedad-1-m.jpg',
+        medium: '/images/propiedad-1-i.jpg',
+        large: '/images/propiedad-1-d.jpg',
+      }
+    },
+    {
+      id: 5,
+      title: 'Oficina Premium en Santiago Centro',
+      price: 3500000,
+      operation: 'arriendo',
+      location: 'Santiago Centro',
+      bedrooms: 0,
+      bathrooms: 2,
+      area: 95,
+      type: 'oficina',
+      description: 'Oficina moderna en edificio corporativo con todas las comodidades',
+      imageUrl: {
+        small: '/images/propiedad-2-m.jpg',
+        medium: '/images/propiedad-2-i.jpg',
+        large: '/images/propiedad-2-d.jpg',
+      }
+    },
+  ];
+
   const [filteredProperties, setFilteredProperties] = useState([]);
 
   useEffect(() => {
-    let currentOperation = operationType;
-    if (!currentOperation) {
-      currentOperation = searchParams.get('operation');
-    }
+    let currentOperationForDisplayAndFiltering = operationType || 'todas';
 
     let filtered = allProperties;
 
-    if (currentOperation) {
-      filtered = filtered.filter(p => p.operation === currentOperation);
+    if (currentOperationForDisplayAndFiltering && currentOperationForDisplayAndFiltering !== 'todas') {
+      filtered = filtered.filter(p => p.operation === currentOperationForDisplayAndFiltering);
     }
 
     const type = searchParams.get('type');
@@ -142,17 +181,16 @@ const Properties = ({ operationType }) => {
       <div className={`relative overflow-hidden ${
         viewMode === 'list' ? 'w-full sm:w-80 h-48 sm:h-auto' : 'h-64'
       }`}>
-        {/* MODIFIED: Use srcset and sizes for responsive images with your naming convention */}
         <img
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           alt={`${property.title} - Propiedad en ${property.location}`}
-          src={property.imageUrl.medium} // Default source for older browsers or as fallback
+          src={property.imageUrl.medium}
           srcSet={`${property.imageUrl.small} 400w,
                    ${property.imageUrl.medium} 800w,
                    ${property.imageUrl.large} 1600w`}
-          sizes="(max-width: 640px) 400px,  /* For screens up to 640px wide, image is 400px wide */
-                 (max-width: 1024px) 800px, /* For screens between 641px and 1024px, image is 800px wide */
-                 1200px"                    /* For screens wider than 1024px, image is 1200px wide (adjust to actual card width) */
+          sizes="(max-width: 640px) 400px,
+                 (max-width: 1024px) 800px,
+                 1200px"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
@@ -234,7 +272,19 @@ const Properties = ({ operationType }) => {
             {operationType ? `Propiedades en ${operationType.charAt(0).toUpperCase() + operationType.slice(1)}` : 'Todas las Propiedades'}
           </h1>
           <p className="text-xl text-gray-600">
-            {filteredProperties.length > 0 ? `Encontramos ${filteredProperties.length} propiedades que coinciden con tu búsqueda` : 'Explora nuestro catálogo de propiedades'}
+            {filteredProperties.length > 0 ? (
+              operationType ? (
+                `Encontramos ${filteredProperties.length} propiedades en ${operationType === 'venta' ? 'venta' : 'arriendo'}.`
+              ) : (
+                `Encontramos ${filteredProperties.length} propiedades que coinciden con tu búsqueda.`
+              )
+            ) : (
+              operationType ? (
+                `No encontramos propiedades en ${operationType === 'venta' ? 'venta' : 'arriendo'} que coincidan con tu búsqueda.`
+              ) : (
+                'Explora nuestro catálogo de propiedades.'
+              )
+            )}
           </p>
         </motion.div>
 
@@ -254,7 +304,8 @@ const Properties = ({ operationType }) => {
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.3 }}
-                className="overflow-hidden"
+                // MODIFIED: Increased padding-top for better visual separation
+                className="overflow-hidden pt-8 px-6 pb-6 bg-white rounded-xl shadow-lg" // Added pt-8, px-6, pb-6 and bg-white/shadow for visual container
               >
                 <SearchFilters />
               </motion.div>
@@ -278,7 +329,6 @@ const Properties = ({ operationType }) => {
               <option value="newest">Más Recientes</option>
               <option value="price-low">Precio: Menor a Mayor</option>
               <option value="price-high">Precio: Mayor a Menor</option>
-              <option value="area">Mayor Superficie</option>
             </select>
           </div>
 
@@ -305,7 +355,7 @@ const Properties = ({ operationType }) => {
 
         <div className={`${
           viewMode === 'grid'
-            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'
+            ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'
             : 'space-y-6'
         }`}>
           {filteredProperties.map((property, index) => (

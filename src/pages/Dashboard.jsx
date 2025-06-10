@@ -19,9 +19,9 @@ import {
 
 // Mock de datos de propiedades del usuario. Reemplazar con API real.
 const initialUserProperties = [
-  { id: 'prop1', title: 'Luminoso Departamento en Las Condes', status: 'publicada', price: 220000000, type: 'departamento', location: 'Las Condes', imageUrl: 'Bright apartment in Las Condes', operation: 'venta' },
-  { id: 'prop2', title: 'Casa con Jardín en Ñuñoa', status: 'en revisión', price: 1800000, type: 'casa', location: 'Ñuñoa', imageUrl: 'House with garden in Nunoa', operation: 'arriendo' },
-  { id: 'prop3', title: 'Oficina Moderna en Providencia', status: 'vendida', price: 95000000, type: 'oficina', location: 'Providencia', imageUrl: 'Modern office in Providencia', operation: 'venta' },
+  { id: 'prop1', title: 'Luminoso Departamento en Las Condes', status: 'publicada', price: 220000000, type: 'departamento', location: 'Las Condes', imageUrl: { small: '/images/propiedad-1-m.jpg', medium: '/images/propiedad-1-i.jpg', large: '/images/propiedad-1-d.jpg' }, operation: 'venta' },
+  { id: 'prop2', title: 'Casa con Jardín en Ñuñoa', status: 'en revisión', price: 1800000, type: 'casa', location: 'Ñuñoa', imageUrl: { small: '/images/propiedad-2-m.jpg', medium: '/images/propiedad-2-i.jpg', large: '/images/propiedad-2-d.jpg' }, operation: 'arriendo' },
+  { id: 'prop3', title: 'Oficina Moderna en Providencia', status: 'vendida', price: 95000000, type: 'oficina', location: 'Providencia', imageUrl: { small: '/images/propiedad-3-m.jpg', medium: '/images/propiedad-3-i.jpg', large: '/images/propiedad-3-d.jpg' }, operation: 'venta' },
 ];
 
 const Dashboard = () => {
@@ -31,18 +31,15 @@ const Dashboard = () => {
   const [filter, setFilter] = useState('todas');
 
   useEffect(() => {
-    // Cargar propiedades del usuario (simulado)
     const storedProperties = localStorage.getItem(`user_properties_${user?.id}`);
     if (storedProperties) {
       setProperties(JSON.parse(storedProperties));
     } else {
-      // Si no hay propiedades guardadas para este usuario, usar las iniciales (para demostración)
-      // y guardarlas en localStorage.
       setProperties(initialUserProperties);
       if(user?.id) localStorage.setItem(`user_properties_${user?.id}`, JSON.stringify(initialUserProperties));
     }
   }, [user]);
-  
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -69,7 +66,7 @@ const Dashboard = () => {
       default: return 'bg-gray-100 text-gray-700';
     }
   };
-  
+
   const formatPrice = (price, operation) => {
     if (operation === 'venta') {
       return `$${(price / 1000000).toFixed(0)}M`;
@@ -102,14 +99,15 @@ const Dashboard = () => {
           <p className="text-xl text-gray-600 mt-2">Gestiona tus propiedades y tu perfil.</p>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
           {/* Sidebar */}
-          <aside className="lg:col-span-1 space-y-6">
-            <motion.div 
+          <aside className="lg:col-span-1">
+            {/* MODIFIED: Changed gradient to be more noticeable (from-gray-100 to-gray-200) */}
+            <motion.div
               initial={{ opacity:0, x: -20 }}
               animate={{ opacity:1, x: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-white p-6 rounded-xl shadow-lg"
+              className="bg-gradient-to-br from-gray-100 to-gray-200 p-6 rounded-xl shadow-lg mb-6" // Degradado de grises
             >
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Navegación</h2>
               <nav className="space-y-2">
@@ -129,11 +127,12 @@ const Dashboard = () => {
               </nav>
             </motion.div>
 
-            <motion.div 
+            {/* MODIFIED: Changed gradient to be more noticeable */}
+            <motion.div
               initial={{ opacity:0, x: -20 }}
               animate={{ opacity:1, x: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white p-6 rounded-xl shadow-lg"
+              className="bg-gradient-to-br from-gray-100 to-gray-200 p-6 rounded-xl shadow-lg" // Degradado de grises
             >
               <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
                 <ListFilter className="mr-2 h-5 w-5 text-blue-600" /> Filtros
@@ -153,12 +152,15 @@ const Dashboard = () => {
             </motion.div>
           </aside>
 
-          {/* Main Content */}
+          {/* Main Content (Contenedor de Mis Propiedades) */}
+          {/* MODIFIED: Added gradient background to the main section container */}
           <main className="lg:col-span-3">
             <motion.section
               initial={{ opacity:0, y: 20 }}
               animate={{ opacity:1, y: 0 }}
               transition={{ delay: 0.3 }}
+              // Aplicamos un degradado para que se diferencie del fondo y de las tarjetas internas (que son bg-white)
+              className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-lg" // Degradado sutil azulado
             >
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-gray-800">Mis Propiedades ({filteredProperties.length})</h2>
@@ -190,7 +192,17 @@ const Dashboard = () => {
                     >
                       <div className="flex flex-col md:flex-row gap-6">
                         <div className="md:w-1/3 h-48 md:h-auto rounded-lg overflow-hidden">
-                          <img  className="w-full h-full object-cover" alt={prop.title} src={`https://source.unsplash.com/random/400x300/?${prop.imageUrl.replace(/\s/g, ',')},property,${index}`} />
+                          <img
+                            className="w-full h-full object-cover"
+                            alt={prop.title}
+                            src={prop.imageUrl.medium}
+                            srcSet={`${prop.imageUrl.small} 400w,
+                                     ${prop.imageUrl.medium} 800w,
+                                     ${prop.imageUrl.large} 1600w`}
+                            sizes="(max-width: 768px) 100vw,
+                                   (max-width: 1024px) 33vw,
+                                   250px"
+                          />
                         </div>
                         <div className="md:w-2/3">
                           <div className="flex justify-between items-start mb-2">

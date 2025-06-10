@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 
-const AuthModal = ({ isOpen, setIsOpen, onLoginSuccess }) => {
+const AuthModal = ({ isOpen, setIsOpen, onLoginSuccess }) => { // onLoginSuccess will handle redirection
   const [isLoginView, setIsLoginView] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const { login, register } = useAuth();
@@ -38,27 +38,25 @@ const AuthModal = ({ isOpen, setIsOpen, onLoginSuccess }) => {
     e.preventDefault();
     let formErrors = {};
     if (!formData.email) formErrors.email = "El correo es requerido.";
-    // else if (!validateEmail(formData.email)) formErrors.email = "Formato de correo inválido."; // Relaxed for demo
     if (!formData.password) formErrors.password = "La contraseña es requerida.";
-    
+
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
       return;
     }
 
     try {
-      // Hardcoded login for demo
-      // For a real app, use the commented out line:
-      // await login(formData.email, formData.password); 
       await login(formData.email, "password"); // Simulate success with any email and "password"
-      
+
       toast({ title: "Inicio de sesión exitoso", description: "¡Bienvenido de nuevo!" });
       setFormData({ email: '', password: '', name: '', phone: '', confirmPassword: ''});
+
+      // MODIFICADO: Llama a onLoginSuccess y luego cierra el modal
       if (onLoginSuccess) {
-        onLoginSuccess();
-      } else {
-        setIsOpen(false);
+        onLoginSuccess(); // <-- Ahora esta función se encarga de la redirección
       }
+      setIsOpen(false); // <-- Cierra el modal SIEMPRE después del login exitoso
+
     } catch (error) {
       toast({ variant: "destructive", title: "Error de inicio de sesión", description: "Correo o contraseña incorrectos (prueba 'password')." });
       setErrors({ general: "Correo o contraseña incorrectos (prueba 'password')." });
@@ -74,7 +72,7 @@ const AuthModal = ({ isOpen, setIsOpen, onLoginSuccess }) => {
     if (!formData.password) formErrors.password = "La contraseña es requerida.";
     else if (!validatePassword(formData.password)) formErrors.password = "La contraseña debe tener al menos 6 caracteres.";
     if (formData.password !== formData.confirmPassword) formErrors.confirmPassword = "Las contraseñas no coinciden.";
-    
+
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
       return;
@@ -115,7 +113,7 @@ const AuthModal = ({ isOpen, setIsOpen, onLoginSuccess }) => {
           transition={{ duration: 0.3, ease: "easeInOut" }}
           onClick={() => setIsOpen(false)}
         >
-          <div 
+          <div
             className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
@@ -170,13 +168,13 @@ const AuthModal = ({ isOpen, setIsOpen, onLoginSuccess }) => {
                     <Lock size={16} className="mr-2" /> Contraseña
                   </Label>
                   <div className="relative">
-                    <Input 
-                      id="password-modal" 
-                      name="password" 
-                      type={showPassword ? 'text' : 'password'} 
-                      placeholder="••••••••" 
-                      value={formData.password} 
-                      onChange={handleChange} 
+                    <Input
+                      id="password-modal"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="••••••••"
+                      value={formData.password}
+                      onChange={handleChange}
                       className={errors.password ? 'border-red-500' : ''}
                     />
                     <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
@@ -191,13 +189,13 @@ const AuthModal = ({ isOpen, setIsOpen, onLoginSuccess }) => {
                     <Label htmlFor="confirmPassword-modal" className="flex items-center text-gray-700">
                       <Lock size={16} className="mr-2" /> Confirmar Contraseña
                     </Label>
-                    <Input 
-                      id="confirmPassword-modal" 
-                      name="confirmPassword" 
-                      type="password" 
-                      placeholder="••••••••" 
-                      value={formData.confirmPassword} 
-                      onChange={handleChange} 
+                    <Input
+                      id="confirmPassword-modal"
+                      name="confirmPassword"
+                      type="password"
+                      placeholder="••••••••"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
                       className={errors.confirmPassword ? 'border-red-500' : ''}
                     />
                     {errors.confirmPassword && <p className="text-red-500 text-xs">{errors.confirmPassword}</p>}

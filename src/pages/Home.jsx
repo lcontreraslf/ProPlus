@@ -1,9 +1,10 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, Star, TrendingUp, Users, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input'; // Importar Input para el campo de texto
+import { Label } from '@/components/ui/label'; // Importar Label si se usa en los filtros
 import SearchFilters from '@/components/SearchFilters';
 import FeaturedProperties from '@/components/FeaturedProperties';
 
@@ -34,65 +35,68 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 gradient-bg hero-pattern"></div>
-        <div className="absolute inset-0 bg-black/20"></div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-8"
-          >
-            <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
-              Tu hogar ideal
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500">
-                te espera
-              </span>
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto leading-relaxed">
-              Descubre miles de propiedades en venta y arriendo. Desde departamentos modernos hasta casas familiares, encuentra el lugar perfecto para ti.
-            </p>
+    // MODIFICADO: Añadido pt-16 para que el contenido empiece debajo del Navbar fijo
+    <div className="min-h-screen pt-16">
+      {/* NUEVA SECCIÓN EN LA PARTE SUPERIOR: Buscador con Imagen Estática (Reemplaza la antigua Hero Section) */}
+      <section className="relative w-full h-[500px] flex items-center justify-center overflow-hidden">
+        {/* Imagen Estática de Fondo */}
+        <img
+          src="/images/home-hero-bg.jpg" // REEMPLAZA ESTA URL CON LA RUTA A TU IMAGEN ESTATICA LOCAL REAL (ej. public/images/home-hero-bg.jpg)
+          alt="Imagen de fondo de buscador de propiedades"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/40"></div> {/* Overlay oscuro */}
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link to="/propiedades">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl hover:shadow-3xl transition-all duration-300 pulse-glow">
-                  <Search className="w-5 h-5 mr-2" />
-                  Explorar Propiedades
-                </Button>
-              </Link>
-              
-              <Button variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold rounded-xl backdrop-blur-sm">
-                Ver Video Tour
-              </Button>
-            </div>
-          </motion.div>
+        {/* Contenedor del Buscador */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="relative z-10 p-8 bg-white/90 backdrop-blur-md rounded-xl shadow-2xl w-full max-w-4xl mx-4"
+        >
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 text-center">
+            Encuentra tu propiedad ideal
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            {/* Dropdown "Comprar" */}
+            <select
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            >
+              <option value="comprar">Comprar</option>
+              <option value="arrendar">Arrendar</option>
+            </select>
 
-          {/* Floating Elements */}
-          <motion.div
-            className="absolute top-20 left-10 w-20 h-20 bg-white/10 rounded-full floating-animation"
-            style={{ animationDelay: '0s' }}
-          />
-          <motion.div
-            className="absolute top-40 right-20 w-16 h-16 bg-yellow-400/20 rounded-full floating-animation"
-            style={{ animationDelay: '2s' }}
-          />
-          <motion.div
-            className="absolute bottom-40 left-20 w-12 h-12 bg-orange-500/20 rounded-full floating-animation"
-            style={{ animationDelay: '4s' }}
-          />
-        </div>
+            {/* Dropdown "Departamento" */}
+            <select
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            >
+              <option value="departamento">Departamento</option>
+              <option value="casa">Casa</option>
+              <option value="oficina">Oficina</option>
+              <option value="local">Local Comercial</option>
+            </select>
 
-        {/* Hero Images */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent"></div>
+            {/* Campo de texto "Barrio, Comuna o ciudad" */}
+            <Input
+              type="text"
+              placeholder="Barrio, Comuna o ciudad"
+              className="w-full p-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+            />
+
+            {/* Botón "Buscar" */}
+            <Button className="w-full bg-gradient-to-r from-teal-500 to-green-500 hover:from-teal-600 hover:to-green-600 text-white py-3 font-semibold rounded-lg shadow-md">
+              <Search className="w-5 h-5 mr-2" /> Buscar
+            </Button>
+          </div>
+          <div className="text-center">
+            <Link to="#" className="text-blue-600 hover:text-blue-800 transition-colors text-sm font-medium">
+              Buscar propiedad por código
+            </Link>
+          </div>
+        </motion.div>
       </section>
 
-      {/* Search Section */}
+      {/* Search Section (Esta sección ya existía, ahora debajo del nuevo buscador) */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -197,37 +201,6 @@ const Home = () => {
               );
             })}
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="space-y-8"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white">
-              ¿Listo para encontrar tu nuevo hogar?
-            </h2>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Únete a miles de personas que ya encontraron su propiedad ideal con nosotros
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/propiedades">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold rounded-xl shadow-xl">
-                  Comenzar Búsqueda
-                </Button>
-              </Link>
-              <Link to="/contacto">
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-4 text-lg font-semibold rounded-xl">
-                  Hablar con un Experto
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
         </div>
       </section>
     </div>
